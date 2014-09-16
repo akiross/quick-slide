@@ -6,32 +6,22 @@ Rectangle {
 	height: 360
 	color: '#345'
 	focus: true
-	/*
-	property int currentSlide: 0
 
-	Keys.onPressed: {
-		if (event.key == Qt.Key_Left) {
-			color = 'red';
-			event.accepted = true;
+	property Item currentSlide: null
 
-			if (currentSlide == 0)
-				children[children]
-			children[currentSlide].visible = false;
+	VisualDataModel {
+		id: visualModel
+
+		model: ListModel {
+			id: slidesModel
+
+			ListElement { title: 'First'; content: 'Foo' }
+			ListElement { title: 'Second'; content: 'Bar' }
+			ListElement { title: 'Third'; content: 'Baz' }
+			ListElement { title: 'Fourth'; content: 'Ban' }
 		}
-		else if (event.key == Qt.Key_Right) {
-			color = 'blue';
-			event.accepted = true;
-			children[currentSlide].visible = true;
-		}
-	}
-	*/
 
-	property Component currentSlide: null
-
-	Component {
-		id: slidesDelegate
-
-		Item {
+		delegate: Item {
 			id: delegateItem
 
 			Rectangle {
@@ -63,22 +53,22 @@ Rectangle {
 					anchors.fill: parent
 					onClicked: {
 						console.log('ho clickato una qualche mouse area...');
-						currentSlide = slidesDelegate
+						currentSlide = delegateItem
 					}
 				}
 
 				states: [
 					State {
-						when: root.currentSlide === slidesDelegate
+						when: root.currentSlide === delegateItem
 						name: "inDisplay"
-						ParentChange { target: slideRectangle; parent: root ; width: root.width ; x: 0; y: 0}
-//						PropertyChanges { target: slideRectangle;  z: 100 }
+						ParentChange { target: slideRectangle; parent: root ; width: root.width; height: root.height; x: 0; y: 0}
+						PropertyChanges { target: slideRectangle;  z: 2 }
 					},
 					State {
-						when: root.currentSlide !== slidesDelegate
+						when: root.currentSlide !== delegateItem
 						name: "inList"
 						ParentChange { target: slideRectangle; parent: delegateItem }
-//						PropertyChanges { target: slideRectangle;  z: 0 }
+						PropertyChanges { target: slideRectangle;  z: 0 }
 					}
 				]
 
@@ -97,33 +87,12 @@ Rectangle {
 			}
 		}
 	}
-/*
-	onCurrentSlideChanged: {
-		if (currentSlide == null) {
-			console.log('nessuna slide selezionata');
-			overviewButton.visible = false;
-		}
-		else {
-			console.log('è stata selezionata una slide!');
-			overviewButton.visible = true;
-		}
-	}
-*/
-	ListModel {
-		id: slidesModel
-
-		ListElement { title: 'First'; content: 'Foo' }
-		ListElement { title: 'Second'; content: 'Bar' }
-		ListElement { title: 'Third'; content: 'Baz' }
-		ListElement { title: 'Fourth'; content: 'Ban' }
-	}
 
 	GridView {
 		cellWidth: 110
 		cellHeight: 100
 		anchors.fill: parent
-		model: slidesModel
-		delegate: slidesDelegate
+		model: visualModel
 	}
 
 	// A button to show all the slides
@@ -135,6 +104,7 @@ Rectangle {
 		anchors.bottom: parent.bottom
 		color: 'green'
 		visible: false
+		z: 100
 
 		states: [
 			State {
