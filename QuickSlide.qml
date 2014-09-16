@@ -2,12 +2,23 @@ import QtQuick 2.2
 
 Rectangle {
 	id: root
-	width: 360
-	height: 360
+	width: 400
+	height: 300
 	color: '#345'
 	focus: true
 
-	property Item currentSlide: null
+	property int currentSlide: 0
+
+	Keys.onPressed: {
+		if (event.key === Qt.Key_Left) {
+			currentSlide = Math.max(-1, currentSlide - 1);
+			event.accepted = true;
+		}
+		else if (event.key === Qt.Key_Right) {
+			currentSlide = Math.min(currentSlide + 1, slidesModel.count - 1);
+			event.accepted = true;
+		}
+	}
 
 	VisualDataModel {
 		id: visualModel
@@ -15,84 +26,26 @@ Rectangle {
 		model: ListModel {
 			id: slidesModel
 
-			ListElement { title: 'First'; content: 'Foo' }
-			ListElement { title: 'Second'; content: 'Bar' }
-			ListElement { title: 'Third'; content: 'Baz' }
-			ListElement { title: 'Fourth'; content: 'Ban' }
+			ListElement { title: 'First'; content: 'Foo'; background: '/home/akiross/Dropbox/Dottorato/Insegnamento/Images/brick-428585_1280.jpg' }
+			ListElement { title: 'Second'; content: 'Bar'; background: ''}
+			ListElement { title: 'Third'; content: 'Baz'; background: '' }
+			ListElement { title: 'Fourth'; content: 'Ban'; background: '' }
 		}
 
-		delegate: Item {
-			id: delegateItem
-
-			Rectangle {
-				id: slideRectangle
-				width: 100
-				height: 90
-				color: 'white'
-
-				Image {
-					id: slideBgImg
-					anchors.fill: parent
-					source: '/home/akiross/Dropbox/Dottorato/Insegnamento/Images/brick-428585_1280.jpg'
-					opacity: 0.2
-				}
-
-				Text {
-					id: slideTitle
-					anchors.horizontalCenter: parent.horizontalCenter
-					text: title
-				}
-
-				Text {
-					anchors.centerIn: parent
-					anchors.top: slideTitle.bottom
-					text: content
-				}
-
-				MouseArea {
-					anchors.fill: parent
-					onClicked: {
-						console.log('ho clickato una qualche mouse area...');
-						currentSlide = delegateItem
-					}
-				}
-
-				states: [
-					State {
-						when: root.currentSlide === delegateItem
-						name: "inDisplay"
-						ParentChange { target: slideRectangle; parent: root ; width: root.width; height: root.height; x: 0; y: 0}
-						PropertyChanges { target: slideRectangle;  z: 2 }
-					},
-					State {
-						when: root.currentSlide !== delegateItem
-						name: "inList"
-						ParentChange { target: slideRectangle; parent: delegateItem }
-						PropertyChanges { target: slideRectangle;  z: 0 }
-					}
-				]
-
-				onStateChanged: {
-					console.log('cambiato lo stato in', state);
-				}
-
-				transitions: [
-					Transition {
-						from: "inDisplay"
-					},
-					Transition {
-						from: "inList"
-					}
-				]
-			}
-		}
+		delegate: Slide { viewCont: root; width: root.width / 4 ; height: root.height / 4 }
 	}
 
 	GridView {
-		cellWidth: 110
-		cellHeight: 100
+		id: gridView
+		cellWidth: width / 4
+		cellHeight: height / 4
 		anchors.fill: parent
 		model: visualModel
+
+		onCurrentItemChanged: {
+			console.log('current item changed in the view', 0);
+		}
+//		move: Transition { NumberAnimation { properties: "x,y"; duration: 400; easing.type: Easing.OutBounce } }
 	}
 
 	// A button to show all the slides
@@ -108,12 +61,12 @@ Rectangle {
 
 		states: [
 			State {
-				when: root.currentSlide === null
+				when: root.currentSlide === -1
 				name: "invisible"
 				PropertyChanges { target: overviewButton; visible: false }
 			},
 			State {
-				when: root.currentSlide !== null
+				when: root.currentSlide !== -1
 				name: 'visible'
 				PropertyChanges { target: overviewButton; visible: true }
 			}
@@ -121,7 +74,7 @@ Rectangle {
 
 		MouseArea {
 			anchors.fill: parent
-			onClicked: currentSlide = null
+			onClicked: currentSlide = -1
 		}
 	}
 
