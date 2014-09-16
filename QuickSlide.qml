@@ -26,7 +26,7 @@ Rectangle {
 		model: ListModel {
 			id: slidesModel
 
-			ListElement { title: 'First'; content: 'Foo'; background: '/home/akiross/Dropbox/Dottorato/Insegnamento/Images/brick-428585_1280.jpg' }
+			ListElement { title: 'First'; content: 'Foo'; background: 'images/coffee.jpg' }
 			ListElement { title: 'Second'; content: 'Bar'; background: ''}
 			ListElement { title: 'Third'; content: 'Baz'; background: '' }
 			ListElement { title: 'Fourth'; content: 'Ban'; background: '' }
